@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gerador – Copo Cloudinary</title>
+<style>
+  body{font-family:system-ui,Arial;margin:24px;max-width:980px}
+  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:10px 0}
+  label{min-width:160px}
+  input[type="text"], input[type="url"]{padding:8px;min-width:300px}
+  input[type="range"]{width:260px}
+  button{padding:10px 14px;cursor:pointer}
+  img{max-width:100%;border:1px solid #ddd;margin-top:16px}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:12px;word-break:break-all;background:#f7f7f7;padding:10px;border:1px solid #eee}
+  .chip{display:inline-block;padding:6px 10px;border:1px solid #ddd;border-radius:999px;background:#fff}
+  .swatch{display:inline-block;width:18px;height:18px;border:1px solid #ccc;vertical-align:middle}
+</style>
+</head>
+<body>
+<h1>Gerar link de imagem personalizada (Cloudinary)</h1>
+
+<div class="row">
+  <label>Cloud name</label>
+  <input id="cloud" value="dr3r1szcw" />
+</div>
+<div class="row">
+  <label>Public ID da base</label>
+  <input id="publicId" value="v1758136687/copo_qyzeoa.jpg" />
+</div>
+
+<div class="row">
+  <label>Nome</label>
+  <input id="nome" placeholder="Ex.: Denis" value="Dennis" />
+</div>
+
+<div class="row">
+  <label>Tamanho (fontsize)</label>
+  <input id="fs" type="range" min="10" max="120" value="27" />
+  <span id="fsv" class="chip">27</span>
+</div>
+<div class="row">
+  <label>Posição X</label>
+  <input id="x" type="range" min="-300" max="300" value="140" />
+  <span id="xv" class="chip">140</span>
+</div>
+<div class="row">
+  <label>Posição Y</label>
+  <input id="y" type="range" min="-300" max="300" value="50" />
+  <span id="yv" class="chip">50</span>
+</div>
+
+<div class="row">
+  <label>Cor (0=cinza • 50=marrom • 100=preto)</label>
+  <input id="cor" type="range" min="0" max="100" value="35" />
+  <span id="corv" class="chip">35</span>
+  <span id="sw" class="swatch"></span>
+</div>
+<div class="row">
+  <label>Opacidade</label>
+  <input id="opac" type="range" min="0" max="100" value="65" />
+  <span id="opacv" class="chip">65</span>
+</div>
+<div class="row">
+  <label>Blur</label>
+  <input id="blur" type="range" min="0" max="16" value="8" />
+  <span id="blurv" class="chip">8</span>
+</div>
+
+<div class="row">
+  <button id="gen">Gerar</button>
+  <button id="copy">Copiar link Cloudinary (.jpg)</button>
+</div>
+
+<p><b>URL da imagem:</b></p>
+<pre id="out" class="mono"></pre>
+<img id="preview" alt="preview" />
+
+<hr />
+<h3>Opcional – link “cartão” (OG, para inbox que não embeda .jpg):</h3>
+<div class="row">
+  <label>Seu domínio Vercel (ex.: https://seu-projeto.vercel.app)</label>
+  <input id="ogdom" type="url" placeholder="https://seu-projeto.vercel.app" />
+</div>
+<div class="row">
+  <button id="copyOg">Copiar link OG (/p?n=...)</button>
+</div>
+<pre id="outOg" class="mono"></pre>
+
+<script>
+const $ = id => document.getElementById(id);
+const enc = s => encodeURIComponent(s || '').replace(/%20/g,'%20');
+
+function hex(n){ return Math.round(n).toString(16).padStart(2,'0'); }
+function lerp(a,b,t){ return a + (b-a)*t; }
+function lerpColor(c1,c2,t){ return [
+  Math.round(lerp(c1[0],c2[0],t)),
+  Math.round(lerp(c1[1],c2[1],t)),
+  Math.round(lerp(c1[2],c2[2],t))
+];}
+function rgbToHex([r,g,b]){ return `#${hex(r)}${hex(g)}${hex(b)}`; }
+function colorFromSlider(v){
+  const p = Math.max(0, Math.min(100, Number(v)));
+  const gray=[0x44,0x44,0x44], brown=[0x3a,0x2f,0x25], blacky=[0x1f,0x1f,0x1f];
+  const t = p<=50 ? p/50 : (p-50)/50;
+  const rgb = p<=50 ? lerpColor(gray,brown,t) : lerpColor(brown,blacky,t);
+  return rgbToHex(rgb).replace('#','');
+}
+
+function buildCloudinaryURL(){
+  const cloud=$('cloud').value.trim(), publicId=$('publicId').value.trim();
+  const nome=$('nome').value.trim()||' ', fs=$('fs').value, x=$('x').value, y=$('y').value;
+  const colorHex=colorFromSlider($('cor').value), opac=$('opac').value, blur=$('blur').value;
+
+  const extras = [];
+  if (colorHex) extras.push(`co_rgb:${colorHex}`);
+  if (Number(opac)>0) extras.push(`o_${opac}`);
+  if (Number(blur)>0) extras.push(`e_blur:${blur}`);
+
+  const base=`https://res.cloudinary.com/${cloud}/image/upload/`;
+  const ltext=`l_text:Permanent%20Marker_${fs}:${enc(nome)}` + (extras.length?`,`+extras.join(','):'');
+  const apply=`fl_layer_apply,g_center,x_${x},y_${y}`;
+  return `${base}${ltext}/${apply}/${publicId}`;
+}
+
+function refresh(){
+  const url=buildCloudinaryURL();
+  $('out').textContent=url;
+  $('preview').src=url;
+  $('fsv').textContent=$('fs').value; $('xv').textContent=$('x').value; $('yv').textContent=$('y').value;
+  $('corv').textContent=$('cor').value; $('opacv').textContent=$('opac').value; $('blurv').textContent=$('blur').value;
+  document.getElementById('sw').style.background=`#${colorFromSlider($('cor').value)}`;
+}
+['cloud','publicId','nome','fs','x','y','cor','opac','blur'].forEach(id=>$(id).addEventListener('input',refresh));
+$('gen').onclick=refresh;
+$('copy').onclick=async()=>{ const url=buildCloudinaryURL(); await navigator.clipboard.writeText(url); alert('Link da IMAGEM copiado!'); };
+$('copyOg').onclick=async()=>{
+  const dom=$('ogdom').value.trim().replace(/\/+$/,''); if(!dom) return alert('Preencha o domínio Vercel (https://...)');
+  const nome=$('nome').value.trim()||' '; const og=`${dom}/p?n=${enc(nome)}`;
+  $('outOg').textContent=og; await navigator.clipboard.writeText(og); alert('Link OG copiado!');
+};
+refresh();
+</script>
+</body>
+</html>
