@@ -1,6 +1,5 @@
-# Vercel – Gerador Cloudinary (layout compacto + preview lateral)
-- Controles principais à esquerda (nome + botões lado a lado).
-- **Preview fixo à direita** (sticky), sempre visível — evita scroll.
-- Mensagem opcional com `{{nome}}` e `{{link}}` + botão Copiar.
-- Sliders em tempo real (fonte, X, Y, cor, opacidade, blur).
-- Destino do clique e domínio customizável (o domínio requer DNS no Vercel).
+# v5b – Defaults: sem corte (pad) + gravidade auto + link curto
+- **Links curtos** (só parâmetros diferentes do padrão, chaves curtas).
+- **Sem corte** por padrão (`c_pad`) + **gravity auto** (evita cortar cabeça/queixo).
+- **Sliders em tempo real** e botões de copiar/baixar.
+- **/api/p** redireciona humanos pro destino e serve OG pros bots.
