@@ -1,1 +1,138 @@
-<html><body><h1>Preview Ajustado</h1></body></html>
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerador • Preview grande (OG) • v9</title>
+<style>
+  :root{--bg:#0b1020;--card:#0f172a;--txt:#e5e7eb;--mut:#94a3b8;--bd:#1e293b;--btn:#38bdf8}
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial}
+  .wrap{max-width:1180px;margin:0 auto;padding:12px}
+  .grid{display:grid;gap:12px;grid-template-columns:3fr 2fr} /* 60% / 40% */
+  @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px}
+  h1{font-size:16px;margin:0 0 8px}
+  label{display:block;font-size:12px;color:var(--mut);margin:6px 0 3px}
+  input[type=text],input[type=url]{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:#0b1220;color:var(--txt)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .sliders{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  @media (max-width:980px){.sliders{grid-template-columns:1fr 1fr}}
+  input[type=range]{width:100%}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  button{padding:8px 10px;border:1px solid var(--bd);background:var(--btn);color:#001826;border-radius:8px;font-weight:700;cursor:pointer}
+  button.secondary{background:#0b1220;color:var(--txt)}
+  .mono{font:12px ui-monospace,Consolas,Menlo,monospace;background:#0b1220;border:1px dashed var(--bd);border-radius:8px;padding:8px;word-break:break-all}
+  .preview{display:flex;align-items:center;justify-content:center;min-height:420px;background:#0a0f1f;border:1px solid var(--bd);border-radius:10px}
+  .preview img{max-width:100%;max-height:560px;border-radius:8px;display:block}
+  small{color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="grid">
+    <div class="card">
+      <h1>Produção rápida</h1>
+
+      <div class="row">
+        <div>
+          <label>Nome (no copo)</label>
+          <input id="n" type="text" value="Dennis">
+        </div>
+        <div>
+          <label>Destino (clique)</label>
+          <input id="dest" type="url" placeholder="https://www.linkedin.com/in/marciomiranda/">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Título do card (OG)</label>
+          <input id="title" type="text" value="Convite especial para você 👋">
+        </div>
+        <div>
+          <label>Descrição (OG)</label>
+          <input id="descr" type="text" value="Acesso prioritário por tempo limitado.">
+        </div>
+      </div>
+
+      <div class="sliders">
+        <div><label>Tamanho (fs)</label><input id="fs" type="range" min="16" max="56" value="28"></div>
+        <div><label>Opacidade</label><input id="o" type="range" min="20" max="100" value="65"></div>
+        <div><label>Blur</label><input id="blur" type="range" min="0" max="12" value="8"></div>
+        <div><label>Posição X</label><input id="x" type="range" min="60" max="260" value="140"></div>
+        <div><label>Posição Y</label><input id="y" type="range" min="10" max="140" value="50"></div>
+        <div><label>Cor (hex)</label><input id="co" type="text" value="3d352e"></div>
+      </div>
+
+      <div class="btns">
+        <button id="btnCopy">Copiar link curto</button>
+        <button id="btnCopyMsg" class="secondary">Copiar texto + link</button>
+        <button id="btnJpg" class="secondary">Baixar JPG</button>
+      </div>
+
+      <label style="margin-top:8px">URL gerada</label>
+      <div id="outLink" class="mono"></div>
+      <label>Texto</label>
+      <div id="outText" class="mono"></div>
+      <small>Use o <a href="https://www.linkedin.com/post-inspector/" target="_blank" style="color:#80dfff">Post Inspector</a> na primeira vez para recachear.</small>
+    </div>
+
+    <div class="card">
+      <h1>Preview</h1>
+      <div class="preview"><img id="imgPrev" alt="preview"></div>
+      <small>O card do LinkedIn vai usar **exatamente** esta imagem como OG (1200×1200), com o título/descrição acima.</small>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLOUD = "dr3r1szcw";
+const PUBLIC = "v1758136687/copo_qyzeoa.jpg";
+const ORIGIN = location.origin;
+
+function $(id){return document.getElementById(id)}
+function enc(s){return encodeURIComponent(s||"")}
+function hex6(v){
+  v = String(v||'').replace(/[^0-9a-f]/gi,'').toLowerCase();
+  if(v.length===3) v = v.split('').map(c=>c+c).join('');
+  return (v+'000000').slice(0,6).slice(0,6);
+}
+function b64url(obj){
+  const s = JSON.stringify(obj);
+  return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+
+function build(){
+  const n = $('n').value.trim().slice(0,40);
+  const fs = +$('fs').value, x= +$('x').value, y= +$('y').value;
+  const o  = +$('o').value, blur= +$('blur').value;
+  const co = hex6($('co').value || '3d352e');
+  const title = $('title').value.trim() || 'Convite especial';
+  const descr = $('descr').value.trim() || 'Vagas limitadas.';
+  const dest  = $('dest').value.trim();
+
+  // preview local (Cloudinary)
+  const w=1200,h=1200;
+  const overlay = `l_text:Permanent%20Marker_${fs}:${enc(n)},co_rgb:${co},o_${o},e_blur:${blur}`;
+  const apply   = `fl_layer_apply,g_center,x_${x},y_${y}`;
+  const img = `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,w_${w},h_${h}/${overlay}/${apply}/${PUBLIC}`;
+  $('imgPrev').src = img;
+
+  // link curto /r/[token] (OG servido diretamente nessa rota)
+  const token = b64url({ n, fs, x, y, o, blur, co, title, descr, dest });
+  const shortUrl = `${ORIGIN}/r/${token}`;
+
+  $('outLink').textContent = shortUrl;
+  $('outText').textContent = `Oi, ${n || '{{nome}}'}! Dá uma olhada 👇\n` + shortUrl;
+
+  $('btnCopy').onclick = async ()=>{ await navigator.clipboard.writeText(shortUrl); alert('Link copiado!'); };
+  $('btnCopyMsg').onclick = async ()=>{ await navigator.clipboard.writeText($('outText').textContent); alert('Mensagem copiada!'); };
+  $('btnJpg').onclick = ()=>{ const a=document.createElement('a'); a.href=img; a.download='preview.jpg'; a.click(); };
+}
+['n','fs','x','y','o','blur','co','title','descr','dest'].forEach(id => $(id).addEventListener('input', build));
+build();
+</script>
+</body>
+</html>
