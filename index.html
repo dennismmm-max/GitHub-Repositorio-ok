@@ -1,128 +1,138 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gerador de link com OG (V10)</title>
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#0e1217;color:#eee}
-    .wrap{display:grid;grid-template-columns:1fr 0.9fr;gap:18px;max-width:1100px;margin:20px auto;padding:16px}
-    h1{font-size:18px;margin:0 0 12px}
-    label{font-size:12px;opacity:.9}
-    input,button{font-size:14px;padding:8px;border-radius:6px;border:1px solid #334;background:#141a22;color:#fff;width:100%}
-    input[type=range]{width:100%}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .btns{display:flex;gap:8px}
-    .btns button{background:#2563eb;border:0;cursor:pointer}
-    .small{font-size:12px;opacity:.8;margin-top:6px;word-break:break-all}
-    .card{background:#111;border:1px solid #333;border-radius:8px;padding:10px}
-    .preview{background:#000;border-radius:8px;overflow:hidden;aspect-ratio:1200/627;border:1px solid #333}
-    .preview img{width:100%;height:100%;object-fit:cover;display:block}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerador • Preview grande (OG) • v9</title>
+<style>
+  :root{--bg:#0b1020;--card:#0f172a;--txt:#e5e7eb;--mut:#94a3b8;--bd:#1e293b;--btn:#38bdf8}
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial}
+  .wrap{max-width:1180px;margin:0 auto;padding:12px}
+  .grid{display:grid;gap:12px;grid-template-columns:3fr 2fr} /* 60% / 40% */
+  @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px}
+  h1{font-size:16px;margin:0 0 8px}
+  label{display:block;font-size:12px;color:var(--mut);margin:6px 0 3px}
+  input[type=text],input[type=url]{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:#0b1220;color:var(--txt)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .sliders{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  @media (max-width:980px){.sliders{grid-template-columns:1fr 1fr}}
+  input[type=range]{width:100%}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  button{padding:8px 10px;border:1px solid var(--bd);background:var(--btn);color:#001826;border-radius:8px;font-weight:700;cursor:pointer}
+  button.secondary{background:#0b1220;color:var(--txt)}
+  .mono{font:12px ui-monospace,Consolas,Menlo,monospace;background:#0b1220;border:1px dashed var(--bd);border-radius:8px;padding:8px;word-break:break-all}
+  .preview{display:flex;align-items:center;justify-content:center;min-height:420px;background:#0a0f1f;border:1px solid var(--bd);border-radius:10px}
+  .preview img{max-width:100%;max-height:560px;border-radius:8px;display:block}
+  small{color:var(--mut)}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div>
+<div class="wrap">
+  <div class="grid">
+    <div class="card">
       <h1>Produção rápida</h1>
-      <div class="row">
-        <div><label>Nome (no copo)</label><input id="n" value="Dennis"></div>
-        <div><label>Cor (hex)</label><input id="co" value="3d352e"></div>
-      </div>
-      <div class="row">
-        <div><label>Título do card (OG)</label><input id="title" value="Convite especial para você 👋"></div>
-        <div><label>Destino do clique</label><input id="dest" value="https://www.linkedin.com/in/marciomiranda/"></div>
-      </div>
-      <div><label>Descrição (OG)</label><input id="desc" value="Acesso prioritário por tempo limitado."></div>
 
       <div class="row">
-        <div><label>Tamanho (fs)</label><input id="fs" type="range" min="16" max="48" value="26"></div>
-        <div><label>Opacidade (0–100)</label><input id="o" type="range" min="0" max="100" value="65"></div>
+        <div>
+          <label>Nome (no copo)</label>
+          <input id="n" type="text" value="Dennis">
+        </div>
+        <div>
+          <label>Destino (clique)</label>
+          <input id="dest" type="url" placeholder="https://www.linkedin.com/in/marciomiranda/">
+        </div>
       </div>
+
       <div class="row">
-        <div><label>Posição X</label><input id="x" type="range" min="0" max="300" value="140"></div>
-        <div><label>Posição Y</label><input id="y" type="range" min="0" max="300" value="50"></div>
+        <div>
+          <label>Título do card (OG)</label>
+          <input id="title" type="text" value="Convite especial para você 👋">
+        </div>
+        <div>
+          <label>Descrição (OG)</label>
+          <input id="descr" type="text" value="Acesso prioritário por tempo limitado.">
+        </div>
       </div>
-      <div class="row">
+
+      <div class="sliders">
+        <div><label>Tamanho (fs)</label><input id="fs" type="range" min="16" max="56" value="28"></div>
+        <div><label>Opacidade</label><input id="o" type="range" min="20" max="100" value="65"></div>
         <div><label>Blur</label><input id="blur" type="range" min="0" max="12" value="8"></div>
-        <div><label>Cloudinary Base (opcional)</label><input id="base" placeholder="v1758136687/copo_qyzeoa.jpg"></div>
+        <div><label>Posição X</label><input id="x" type="range" min="60" max="260" value="140"></div>
+        <div><label>Posição Y</label><input id="y" type="range" min="10" max="140" value="50"></div>
+        <div><label>Cor (hex)</label><input id="co" type="text" value="3d352e"></div>
       </div>
 
-      <div class="btns" style="margin-top:12px">
-        <button id="copy">Copiar link curto</button>
-        <button id="copymm">Copiar texto + link</button>
+      <div class="btns">
+        <button id="btnCopy">Copiar link curto</button>
+        <button id="btnCopyMsg" class="secondary">Copiar texto + link</button>
+        <button id="btnJpg" class="secondary">Baixar JPG</button>
       </div>
-      <div class="small">URL gerada: <span id="url"></span></div>
-      <div class="small">Dica: rode 1x no <a style="color:#9cf" href="https://www.linkedin.com/post-inspector/" target="_blank">LinkedIn Post Inspector</a> e depois cole no inbox.</div>
+
+      <label style="margin-top:8px">URL gerada</label>
+      <div id="outLink" class="mono"></div>
+      <label>Texto</label>
+      <div id="outText" class="mono"></div>
+      <small>Use o <a href="https://www.linkedin.com/post-inspector/" target="_blank" style="color:#80dfff">Post Inspector</a> na primeira vez para recachear.</small>
     </div>
 
     <div class="card">
-      <div class="preview"><img id="img" alt="preview"></div>
-      <div class="small" id="hint"></div>
+      <h1>Preview</h1>
+      <div class="preview"><img id="imgPrev" alt="preview"></div>
+      <small>O card do LinkedIn vai usar **exatamente** esta imagem como OG (1200×1200), com o título/descrição acima.</small>
     </div>
   </div>
+</div>
 
 <script>
-const cloud = "dr3r1szcw";
-const pubDefault = "v1758136687/copo_qyzeoa.jpg";
+const CLOUD = "dr3r1szcw";
+const PUBLIC = "v1758136687/copo_qyzeoa.jpg";
+const ORIGIN = location.origin;
 
-function b64u(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
-
-function buildImg(p){
-  const name = encodeURIComponent((p.n||'').trim().slice(0,40));
-  const fs = Number(p.fs||26);
-  const x = Number(p.x||140), y=Number(p.y||50);
-  const co = (p.co||'3d352e').replace(/[^0-9a-f]/gi,'').slice(0,6);
-  const o = Math.max(0, Math.min(100, Number(p.o||65)));
-  const blur = Math.max(0, Math.min(12, Number(p.blur||8)));
-  const pub = (p.base && p.base.trim()) || pubDefault;
-  // 1200x627 output
-  const overlay = `l_text:Permanent%20Marker_${fs}:${name},co_rgb:${co},o_${o},e_blur:${blur}/fl_layer_apply,g_center,x_${x},y_${y}`;
-  return `https://res.cloudinary.com/${cloud}/image/upload/c_fill,w_1200,h_627/${overlay}/${pub}`;
+function $(id){return document.getElementById(id)}
+function enc(s){return encodeURIComponent(s||"")}
+function hex6(v){
+  v = String(v||'').replace(/[^0-9a-f]/gi,'').toLowerCase();
+  if(v.length===3) v = v.split('').map(c=>c+c).join('');
+  return (v+'000000').slice(0,6).slice(0,6);
+}
+function b64url(obj){
+  const s = JSON.stringify(obj);
+  return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 
-function readParams(){
-  const p = {
-    n:document.getElementById('n').value,
-    fs:document.getElementById('fs').value,
-    x:document.getElementById('x').value,
-    y:document.getElementById('y').value,
-    co:document.getElementById('co').value,
-    o:document.getElementById('o').value,
-    blur:document.getElementById('blur').value,
-    title:document.getElementById('title').value,
-    desc:document.getElementById('desc').value,
-    dest:document.getElementById('dest').value,
-    base:document.getElementById('base').value
-  };
-  return p;
-}
+function build(){
+  const n = $('n').value.trim().slice(0,40);
+  const fs = +$('fs').value, x= +$('x').value, y= +$('y').value;
+  const o  = +$('o').value, blur= +$('blur').value;
+  const co = hex6($('co').value || '3d352e');
+  const title = $('title').value.trim() || 'Convite especial';
+  const descr = $('descr').value.trim() || 'Vagas limitadas.';
+  const dest  = $('dest').value.trim();
 
-function refresh(){
-  const p = readParams();
-  document.getElementById('img').src = buildImg(p);
-  const token = b64u(p);
-  const pretty = `${location.origin}/card/${token}`;
-  document.getElementById('url').textContent = pretty;
-  document.getElementById('hint').textContent = 'O card grande usará exatamente esta imagem como og:image (1200x627).';
-}
-for(const id of ['n','fs','x','y','co','o','blur','title','desc','dest','base']){
-  document.getElementById(id).addEventListener('input', refresh);
-}
+  // preview local (Cloudinary)
+  const w=1200,h=1200;
+  const overlay = `l_text:Permanent%20Marker_${fs}:${enc(n)},co_rgb:${co},o_${o},e_blur:${blur}`;
+  const apply   = `fl_layer_apply,g_center,x_${x},y_${y}`;
+  const img = `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,w_${w},h_${h}/${overlay}/${apply}/${PUBLIC}`;
+  $('imgPrev').src = img;
 
-document.getElementById('copy').onclick = async ()=>{
-  refresh();
-  await navigator.clipboard.writeText(document.getElementById('url').textContent);
-  alert('Link curto copiado!');
-};
-document.getElementById('copymm').onclick = async ()=>{
-  refresh();
-  const url = document.getElementById('url').textContent;
-  const n = document.getElementById('n').value || 'aí';
-  const txt = `Oi, ${n}! Dá uma olhada 👇 ${url}`;
-  await navigator.clipboard.writeText(txt);
-  alert('Texto + link copiados!');
-};
+  // link curto /r/[token] (OG servido diretamente nessa rota)
+  const token = b64url({ n, fs, x, y, o, blur, co, title, descr, dest });
+  const shortUrl = `${ORIGIN}/r/${token}`;
 
-refresh();
+  $('outLink').textContent = shortUrl;
+  $('outText').textContent = `Oi, ${n || '{{nome}}'}! Dá uma olhada 👇\n` + shortUrl;
+
+  $('btnCopy').onclick = async ()=>{ await navigator.clipboard.writeText(shortUrl); alert('Link copiado!'); };
+  $('btnCopyMsg').onclick = async ()=>{ await navigator.clipboard.writeText($('outText').textContent); alert('Mensagem copiada!'); };
+  $('btnJpg').onclick = ()=>{ const a=document.createElement('a'); a.href=img; a.download='preview.jpg'; a.click(); };
+}
+['n','fs','x','y','o','blur','co','title','descr','dest'].forEach(id => $(id).addEventListener('input', build));
+build();
 </script>
-</body></html>
+</body>
+</html>
