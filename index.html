@@ -3,98 +3,159 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Gerador – Copo Cloudinary (rápido + ajustes)</title>
+<title>Gerador – Copo Cloudinary (layout compacto)</title>
 <style>
   :root{--gap:10px}
-  body{font-family:system-ui,Arial;margin:24px;max-width:1000px}
-  h2{margin:0 0 14px}
-  .row{display:flex;gap:var(--gap);align-items:center;flex-wrap:wrap}
-  input[type="text"]{padding:10px 12px;font-size:16px;min-width:260px}
-  button{padding:10px 14px;font-size:15px;cursor:pointer}
-  .mono{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:#f7f7f7;padding:8px 10px;border:1px solid #eee;margin-top:8px;word-break:break-all}
-  .chip{display:inline-block;padding:4px 8px;border:1px solid #ddd;border-radius:999px;background:#fff;font-size:12px}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,Arial;margin:16px}
+  .wrap{display:grid;grid-template-columns:1fr 480px;gap:16px;align-items:start;max-width:1280px;margin:0 auto}
+  @media (max-width: 1100px){ .wrap{grid-template-columns:1fr} }
+  h2{margin:0 0 10px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  input[type="text"],input[type="url"],textarea{padding:10px 12px;font-size:16px}
+  input[type="text"]{min-width:240px}
+  button{padding:10px 14px;font-size:14px;cursor:pointer}
+  textarea{width:100%;min-height:64px;resize:vertical}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:#f7f7f7;padding:6px 8px;border:1px solid #eee;margin-top:6px;word-break:break-all}
+  .chip{display:inline-block;padding:3px 8px;border:1px solid #ddd;border-radius:999px;background:#fff;font-size:12px}
   .swatch{display:inline-block;width:18px;height:18px;border:1px solid #bbb;vertical-align:middle}
-  .section{margin-top:18px;padding-top:10px;border-top:1px dashed #ddd}
-  img{max-width:100%;border:1px solid #ddd;margin-top:10px}
-  label{min-width:160px}
-  input[type="range"]{width:260px}
+  .section{margin-top:10px;padding-top:8px;border-top:1px dashed #ddd}
+  label{min-width:150px}
+  input[type="range"]{width:220px}
   details{margin-top:6px}
   summary{cursor:pointer;color:#333}
+  .subtle{color:#666;font-size:12px}
+  .panel{padding:8px;border:1px solid #eee;border-radius:8px}
+  .sticky{position:sticky;top:10px}
+  .preview{display:block;max-width:100%;height:auto;border:1px solid #ddd}
+  .tiny{font-size:11px;color:#666}
+  .nowrap{white-space:nowrap}
 </style>
 </head>
 <body>
-<h2>Gerador rápido – 1 campo + 2 cliques</h2>
+<div class="wrap">
+  <!-- Coluna esquerda: controles -->
+  <div class="panel">
+    <h2>Produção rápida</h2>
 
-<div class="row">
-  <input id="nome" placeholder="Digite o primeiro nome..." autofocus />
-  <button id="copyOg">Copiar link p/ LinkedIn</button>
-  <button id="download">Baixar JPG</button>
-</div>
-
-<pre id="ultimoLink" class="mono"></pre>
-
-<div class="section">
-  <details open>
-    <summary><b>Ajustes (tempo real)</b> – use só quando precisar</summary>
-
-    <div class="row" style="margin-top:10px">
-      <label>Tamanho (font-size)</label>
-      <input id="fs" type="range" min="10" max="120" value="27" />
-      <span id="fsv" class="chip">27</span>
-    </div>
-
+    <!-- Linha principal (nome + botões lado a lado) -->
     <div class="row">
-      <label>Posição X</label>
-      <input id="x" type="range" min="-300" max="300" value="140" />
-      <span id="xv" class="chip">140</span>
+      <input id="nome" placeholder="Primeiro nome..." autofocus />
+      <button id="copyOg" title="Copia o link para colar no LinkedIn">Copiar link</button>
+      <button id="copyMsg" title="Copia seu TEXTO + link">Copiar texto+link</button>
+      <button id="download" title="Baixa o JPG para anexar">Baixar JPG</button>
+    </div>
+    <div class="tiny">Enter no campo de nome também copia o link.</div>
+    <pre id="ultimoLink" class="mono"></pre>
+
+    <!-- Mensagem (inline, com botão ao lado) -->
+    <div class="section">
+      <div class="row">
+        <textarea id="mensagem" placeholder="Ex.: Oi, {{nome}}! Dá uma olhada 👇 (use {{nome}} e {{link}})"></textarea>
+        <button id="saveMsg" class="nowrap">Salvar msg padrão</button>
+      </div>
+      <div class="tiny" id="msgSaved">mensagem não salva</div>
     </div>
 
-    <div class="row">
-      <label>Posição Y</label>
-      <input id="y" type="range" min="-300" max="300" value="50" />
-      <span id="yv" class="chip">50</span>
+    <!-- Destino e domínio (compactos) -->
+    <div class="section">
+      <div class="row">
+        <input id="dest" type="url" placeholder="Destino do clique (ex.: perfil do Márcio)" style="flex:1" />
+        <button id="applyDest" class="nowrap">Usar destino</button>
+      </div>
+      <div class="tiny" id="destv">DESTINO: padrão (perfil do Márcio)</div>
+
+      <div class="row" style="margin-top:6px">
+        <input id="dominio" type="url" placeholder="Domínio do link (opcional)" style="flex:1" />
+        <button id="applyDom" class="nowrap">Usar domínio</button>
+      </div>
+      <div class="tiny" id="domv">DOMÍNIO: automático (este Vercel)</div>
     </div>
 
-    <div class="row">
-      <label>Cor (0=cinza • 50=marrom • 100=preto)</label>
-      <input id="cor" type="range" min="0" max="100" value="35" />
-      <span id="corv" class="chip">35</span>
-      <span id="sw" class="swatch"></span>
-    </div>
+    <!-- Ajustes finos (sliders) -->
+    <div class="section">
+      <details open>
+        <summary><b>Ajustes (tempo real)</b></summary>
 
-    <div class="row">
-      <label>Opacidade</label>
-      <input id="opac" type="range" min="0" max="100" value="65" />
-      <span id="opacv" class="chip">65</span>
-    </div>
+        <div class="row" style="margin-top:8px">
+          <label>Tamanho</label>
+          <input id="fs" type="range" min="10" max="120" value="27" />
+          <span id="fsv" class="chip">27</span>
+        </div>
 
-    <div class="row">
-      <label>Blur</label>
-      <input id="blur" type="range" min="0" max="16" value="8" />
-      <span id="blurv" class="chip">8</span>
-    </div>
+        <div class="row">
+          <label>Posição X</label>
+          <input id="x" type="range" min="-300" max="300" value="140" />
+          <span id="xv" class="chip">140</span>
+        </div>
 
-    <div class="row">
-      <button id="copyOg2">Copiar link p/ LinkedIn (com ajustes)</button>
-      <button id="download2">Baixar JPG (com ajustes)</button>
-    </div>
+        <div class="row">
+          <label>Posição Y</label>
+          <input id="y" type="range" min="-300" max="300" value="50" />
+          <span id="yv" class="chip">50</span>
+        </div>
 
-    <p><b>Preview em tempo real:</b></p>
-    <img id="preview" alt="preview" />
-  </details>
+        <div class="row">
+          <label>Cor (0 cinza • 50 marrom • 100 preto)</label>
+          <input id="cor" type="range" min="0" max="100" value="35" />
+          <span id="corv" class="chip">35</span>
+          <span id="sw" class="swatch"></span>
+        </div>
+
+        <div class="row">
+          <label>Opacidade</label>
+          <input id="opac" type="range" min="0" max="100" value="65" />
+          <span id="opacv" class="chip">65</span>
+        </div>
+
+        <div class="row">
+          <label>Blur</label>
+          <input id="blur" type="range" min="0" max="16" value="8" />
+          <span id="blurv" class="chip">8</span>
+        </div>
+
+        <div class="row" style="margin-top:6px">
+          <button id="copyOg2">Copiar link (com ajustes)</button>
+          <button id="download2">Baixar JPG (com ajustes)</button>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- Coluna direita: preview sticky sempre visível -->
+  <div class="panel sticky">
+    <div class="row" style="justify-content:space-between;align-items:baseline">
+      <b>Preview</b>
+      <span class="tiny">Imagem Cloudinary atual</span>
+    </div>
+    <img id="preview" class="preview" alt="preview" />
+  </div>
 </div>
 
 <script>
-  // ==== CONFIG BASE ====
+  // ==== CONFIG ====
   const CLOUD    = 'dr3r1szcw';
   const PUBLICID = 'v1758136687/copo_qyzeoa.jpg';
-
-  // defaults (podem ser trocados a qualquer momento)
   const DEF = { fs:27, x:140, y:50, co:'2b2b2b', o:65, blur:8 };
+  let CLICK_DEST = 'https://www.linkedin.com/in/marciomiranda/';
+  let CUSTOM_ORIGIN = '';
+  let MSG_TEMPLATE = 'Oi, {{nome}}! Dá uma olhada 👇';
 
   const $ = id => document.getElementById(id);
   const enc = s => encodeURIComponent((s||'').trim());
 
+  // prefs
+  function savePref(){ localStorage.setItem('cfg', JSON.stringify({CLICK_DEST, CUSTOM_ORIGIN, MSG_TEMPLATE})); }
+  function loadPref(){
+    try{
+      const cfg = JSON.parse(localStorage.getItem('cfg')||'{}');
+      if(cfg.CLICK_DEST) CLICK_DEST = cfg.CLICK_DEST;
+      if(cfg.CUSTOM_ORIGIN) CUSTOM_ORIGIN = cfg.CUSTOM_ORIGIN;
+      if(cfg.MSG_TEMPLATE) MSG_TEMPLATE = cfg.MSG_TEMPLATE;
+    }catch{}
+  }
+
+  // cores util
   function hex(n){ return Math.round(n).toString(16).padStart(2,'0'); }
   function lerp(a,b,t){ return a + (b-a)*t; }
   function lerpColor(c1,c2,t){ return [
@@ -122,6 +183,10 @@
     };
   }
 
+  function originForLink(){
+    return (CUSTOM_ORIGIN || location.origin).replace(/\/+$/,'');
+  }
+
   function buildCloudinaryURL(nome, p=getParams()){
     const base  = `https://res.cloudinary.com/${CLOUD}/image/upload/`;
     const ltxt  = `l_text:Permanent%20Marker_${p.fs}:${enc(nome)},co_rgb:${p.co}${p.o>0?`,o_${p.o}`:''}${p.blur>0?`,e_blur:${p.blur}`:''}`;
@@ -130,8 +195,9 @@
   }
 
   function buildOgLink(nome, p=getParams()){
-    const origin = location.origin.replace(/\/+$/,''); // domínio atual Vercel
-    return `${origin}/p?n=${enc(nome)}&fs=${p.fs}&x=${p.x}&y=${p.y}&co=${p.co}&o=${p.o}&blur=${p.blur}`;
+    const o = originForLink();
+    const params = `n=${enc(nome)}&fs=${p.fs}&x=${p.x}&y=${p.y}&co=${p.co}&o=${p.o}&blur=${p.blur}&dest=${enc(CLICK_DEST)}`;
+    return `${o}/p?${params}`;
   }
 
   async function downloadImage(url, filename='copo.jpg'){
@@ -146,6 +212,10 @@
     URL.revokeObjectURL(a.href);
   }
 
+  function interpolateMsg(nome, link){
+    return (MSG_TEMPLATE || '').replace(/\{\{\s*nome\s*\}\}/gi, nome).replace(/\{\{\s*link\s*\}\}/gi, link);
+  }
+
   function refreshPreview(){
     const nome = $('nome').value || ' ';
     const p = getParams();
@@ -158,17 +228,24 @@
     $('opacv').textContent= p.o;
     $('blurv').textContent= p.blur;
     $('sw').style.background = '#' + p.co;
-    // também atualiza o último link mostrado (só como referência)
     $('ultimoLink').textContent = buildOgLink(nome, p);
   }
 
-  // topo — uso em escala (nome -> copiar/baixar)
+  // Botões principais
   $('copyOg').onclick = async () => {
     const nome = $('nome').value || '';
     if (!nome.trim()) { alert('Digite o nome.'); return; }
     const link = buildOgLink(nome);
     await navigator.clipboard.writeText(link);
     $('ultimoLink').textContent = link;
+  };
+  $('copyMsg').onclick = async () => {
+    const nome = $('nome').value || '';
+    if (!nome.trim()) { alert('Digite o nome.'); return; }
+    const link = buildOgLink(nome);
+    const msg  = interpolateMsg(nome, link);
+    await navigator.clipboard.writeText(msg || link);
+    $('ultimoLink').textContent = msg || link;
   };
   $('download').onclick = async () => {
     const nome = $('nome').value || '';
@@ -178,7 +255,7 @@
     $('ultimoLink').textContent = img;
   };
 
-  // seção de ajustes — com os parâmetros atuais
+  // Com ajustes
   $('copyOg2').onclick = async () => {
     const nome = $('nome').value || '';
     if (!nome.trim()) { alert('Digite o nome.'); return; }
@@ -194,15 +271,49 @@
     $('ultimoLink').textContent = img;
   };
 
-  // eventos em tempo real
+  // Aplicar destino/ domínio
+  $('applyDest').onclick = () => {
+    const v = $('dest').value.trim();
+    CLICK_DEST = v || 'https://www.linkedin.com/in/marciomiranda/';
+    localStorage.setItem('cfg', JSON.stringify({CLICK_DEST, CUSTOM_ORIGIN, MSG_TEMPLATE}));
+    $('destv').textContent = 'DESTINO: ' + CLICK_DEST;
+    refreshPreview();
+  };
+  $('applyDom').onclick = () => {
+    const v = $('dominio').value.trim().replace(/\/$/, '');
+    CUSTOM_ORIGIN = v || '';
+    localStorage.setItem('cfg', JSON.stringify({CLICK_DEST, CUSTOM_ORIGIN, MSG_TEMPLATE}));
+    $('domv').textContent = CUSTOM_ORIGIN ? ('DOMÍNIO: ' + CUSTOM_ORIGIN) : 'DOMÍNIO: automático (este Vercel)';
+    refreshPreview();
+  };
+
+  // Mensagem
+  $('saveMsg').onclick = () => {
+    MSG_TEMPLATE = $('mensagem').value;
+    localStorage.setItem('cfg', JSON.stringify({CLICK_DEST, CUSTOM_ORIGIN, MSG_TEMPLATE}));
+    $('msgSaved').textContent = 'mensagem salva';
+  };
+
+  // Eventos
   ['nome','fs','x','y','cor','opac','blur'].forEach(id => {
     document.getElementById(id).addEventListener('input', refreshPreview);
   });
-  // Enter = copiar link OG (rápido)
   $('nome').addEventListener('keydown', e => { if(e.key==='Enter') $('copyOg').click(); });
 
-  // inicial
-  refreshPreview();
+  // Boot
+  (function init(){
+    try{
+      const cfg = JSON.parse(localStorage.getItem('cfg')||'{}');
+      if(cfg.CLICK_DEST) CLICK_DEST = cfg.CLICK_DEST;
+      if(cfg.CUSTOM_ORIGIN) CUSTOM_ORIGIN = cfg.CUSTOM_ORIGIN;
+      if(cfg.MSG_TEMPLATE) { MSG_TEMPLATE = cfg.MSG_TEMPLATE; $('mensagem').value = MSG_TEMPLATE; }
+      if (CUSTOM_ORIGIN) $('dominio').value = CUSTOM_ORIGIN;
+      if (CLICK_DEST && CLICK_DEST !== 'https://www.linkedin.com/in/marciomiranda/') $('dest').value = CLICK_DEST;
+      if (CUSTOM_ORIGIN) $('domv').textContent = 'DOMÍNIO: ' + CUSTOM_ORIGIN;
+      if (CLICK_DEST) $('destv').textContent = 'DESTINO: ' + CLICK_DEST;
+    }catch{}
+    refreshPreview();
+  })();
 </script>
 </body>
 </html>

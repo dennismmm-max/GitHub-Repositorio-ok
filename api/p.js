@@ -1,5 +1,4 @@
-// api/p.js — Vercel Serverless Function (OG card minimizado)
-// GET /api/p?n=Nome&fs=27&x=140&y=50&co=2b2b2b&o=65&blur=8
+// api/p.js — OG + redirect humano + crop Cloudinary
 export default function handler(req, res) {
   try {
     const q = req.query;
@@ -20,17 +19,25 @@ export default function handler(req, res) {
     if (o > 0)    extras.push(`o_${o}`);
     if (blur > 0) extras.push(`e_blur:${blur}`);
 
-    // imagem 1200x627 para evitar cortes no LinkedIn
     const ogImage =
       `https://res.cloudinary.com/${CLOUD}/image/upload/` +
       `l_text:Permanent%20Marker_${fs}:${enc},${extras.join(',')}/` +
       `fl_layer_apply,g_center,x_${x},y_${y}/` +
-      `c_pad,w_1200,h_627,b_auto/` +
+      `c_fill,g_center,w_1200,h_627/` +
       `${PUBLIC_ID}`;
 
-    // título e descrição invisíveis (não remove o domínio do cartão)
-    const ZWSP = '\\u200B';
+    const CLICK_DEST = String(q.dest || 'https://www.linkedin.com/in/marciomiranda/');
 
+    const ua = String(req.headers['user-agent'] || '').toLowerCase();
+    const isBot = /(linkedinbot|twitterbot|facebookexternalhit|slackbot|embedly|bot|crawler|spider)/.test(ua);
+
+    if (!isBot) {
+      res.writeHead(302, { Location: CLICK_DEST });
+      res.end();
+      return;
+    }
+
+    const ZWSP = '\\u200B';
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.status(200).send(`<!doctype html><html lang="pt-br"><head>
 <meta charset="utf-8">
@@ -41,6 +48,7 @@ export default function handler(req, res) {
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="627">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Márcio Miranda">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="${ogImage}">
 </head><body></body></html>`);
